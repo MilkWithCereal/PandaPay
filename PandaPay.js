@@ -1,7 +1,5 @@
-// Check if Panda wallet is installed
 const isPandaInstalled = window.panda.isReady;
 
-// Initialize the Panda wallet provider
 const initProvider = () => {
   if ('panda' in window) {
     const provider = window.panda;
@@ -11,19 +9,14 @@ const initProvider = () => {
     }
   }
 
-  // Open the Chrome Web Store to install Panda wallet if not installed
   window.open('https://chromewebstore.google.com/detail/panda-wallet/mlbnicldlpdimbjdcncnklfempedeipj', '_blank');
 };
 
-// Default Bitcoin SV address for testing
-const Iwantthisaddress = "";
-// Array to store wallet addresses
+var Iwantthisaddress = "";
 var receiver = [];
-// Default argument set
 var argumentset = "";
 
 class pandawallet {
-  // Define the extension information
   getInfo() {
     return {
       id: 'Pandawallet',
@@ -32,7 +25,6 @@ class pandawallet {
       color2: '#89ABE3', // pure green
       color3: '#89ABE3', // pure blue
 
-      // Menu icon for the extension
       menuIconURI: "https://i.ibb.co/g9gYKc6/DALL-E-2023-12-16-23-38-12-Design-a-sleek-minimalistic-logo-for-Panda-Pay-suitable-for-a-web-extensi.png",
 
       blocks: [
@@ -128,43 +120,36 @@ class pandawallet {
     };
   }
 
-  // Check if Panda wallet is installed
   pandahas() {
     return isPandaInstalled;
   }
 
-  // Check if Panda wallet is connected
   pandahas2() {
     const wallet = initProvider();
     return wallet.isConnected();
   }
 
-  // Connect to Panda wallet
   pandaconnect() {
     const wallet = initProvider();
     wallet.connect();
   }
 
-  // Get Panda wallet addresses
   getaddresses(args) {
     Iwantthisaddress = args.addressthing.toLowerCase();
     return getaddressesasync(Iwantthisaddress);
   }
 
-  // Disconnect from Panda wallet
   pandadisconnect() {
     const wallet = initProvider();
     wallet.disconnect();
   }
 
-  // Send BSV to a single address
   sendamoney(args) {
     let one = args.muns;
     let two = args.target;
     sendamoney_outside(one, two);
   }
 
-  // Send BSV to multiple addresses
   sendamoremoney(args) {
     let one = args.muns1;
     let two = args.target1;
@@ -176,7 +161,6 @@ class pandawallet {
   }
 }
 
-// Get Panda wallet addresses asynchronously
 async function getaddressesasync(Iwantthisaddress) {
   const wallet = initProvider();
   try {
@@ -208,7 +192,6 @@ async function getaddressesasync(Iwantthisaddress) {
   }
 }
 
-// Send BSV to a single address outside the extension
 async function sendamoney_outside(one, two) {
   const wallet = initProvider();
   const paymentParams = [
@@ -217,7 +200,7 @@ async function sendamoney_outside(one, two) {
       address: two,
     },
   ];
-  
+
   try {
     const exchangeRate = await getexchangerate(one); // Replace "bsv" with the appropriate argument
     console.log("Exchange Rate:", exchangeRate);
@@ -228,3 +211,50 @@ async function sendamoney_outside(one, two) {
     console.log(err);
   }
 }
+
+async function sendamoney_outside_multi(one, two, three, four, five, six) {
+  const wallet = initProvider();
+  const paymentParams = [
+    {
+      satoshis: parseFloat(one),
+      address: two,
+    },
+    {
+      satoshis: parseFloat(three),
+      address: four,
+    },
+    {
+      satoshis: parseFloat(five),
+      address: six,
+    },
+  ];
+
+  try {
+    const exchangeRate1 = await getexchangerate(one); // Replace "bsv" with the appropriate argument
+    console.log("Exchange Rate 1:", exchangeRate1);
+    const exchangeRate2 = await getexchangerate(three); // Replace "bsv" with the appropriate argument
+    console.log("Exchange Rate 2:", exchangeRate2);
+    const exchangeRate3 = await getexchangerate(five); // Replace "bsv" with the appropriate argument
+    console.log("Exchange Rate 3:", exchangeRate3);
+    const { txid, rawtx } = await wallet.sendBsv(paymentParams);
+    console.log(txid);
+    // f2fc518036d96c956c30b995b4b0a70d6008b4b7ef666f7c913b2a79ab57d679
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getexchangerate(exch) {
+  const wallet = initProvider(); // see "Detecting the Provider"
+  try {
+    console.log("Attempting to get exchange rate for:", exch);
+    const rate = await wallet.getExchangeRate(exch);
+    console.log("Exchange rate:", rate);
+    return rate;
+  } catch (err) {
+    console.error("Error getting exchange rate:", err);
+    return null;
+  }
+}
+
+Scratch.extensions.register(new pandawallet());
